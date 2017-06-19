@@ -1,6 +1,7 @@
 package hello;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,15 +32,15 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
                     request.getSession().invalidate();
                 }
                 else{
-                    System.out.println("Invalid Request");
+                    System.out.println("Invalid Request! Token Mismatch!");
                     request.setAttribute("IsValidRequest","false");
                 }
             }
         }
         else if(uri.endsWith("logout")){
             if(request.getSession().isNew()){
+                request.getSession().invalidate();
                 System.out.println("User not logged in!!");
-                return false;
             }
             else{
                 String username = request.getParameter("username");
@@ -62,6 +63,9 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
                 System.out.println("Invalid Check Balance Request");
                 return false;
             }
+        }
+        else if(uri.endsWith("signup")){
+            System.out.println("Redirecting to Signup Page");
         }
         return true;
     }

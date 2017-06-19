@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -17,12 +18,13 @@ public class LogoutController {
     @Autowired
     UserRepository userRepository;
 
-    @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public String logout(@RequestParam(value = "username",defaultValue = "null")String username, HttpSession session){
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public String logout(@RequestParam(value = "username",defaultValue = "null")String username, HttpSession session,
+                         HttpServletRequest request){
+
         if(session.isNew()){
-            System.out.println("Logout Session ID: " + session.getId());
             session.invalidate();
-            return "User Not Logged In";
+            return "User Not Logged In!!";
         }
         else{
             for(User user: userRepository.findAll()){

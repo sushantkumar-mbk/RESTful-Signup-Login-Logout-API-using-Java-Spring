@@ -1,7 +1,11 @@
 package hello;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by sushantkumar on 13/6/17.
@@ -12,11 +16,21 @@ public class SignupController {
     @Autowired
     public UserRepository repository;
 
-    @RequestMapping(value = "/signup", method = RequestMethod.GET)
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String signup(@RequestParam(value = "username", defaultValue = "null") String username,
-                       @RequestParam(value = "password") String password,
-                       @RequestParam(value = "confirm_password") String confirmPassword
+                         HttpServletRequest request
     ){
+
+        String password = request.getHeader("password");
+        String confirmPassword = request.getHeader("confirmPassword");
+
+        if(password == null || confirmPassword == null){
+            return "Password Missing Error!!";
+        }
+
         if(username!=null){
             for(User user : repository.findAll()){
                 if(user.getUsername().equals(username)){
@@ -35,8 +49,9 @@ public class SignupController {
             return "Password is short. Minimum 8 characters required";
         }
         else {
-            System.out.println("Inserting Record with \nUsername: " + username + "\tPassword: " + password);
-            repository.save(new User(username, password));
+            System.out.println("Inserting Record");
+            //System.out.println("Inserting Record with \nUsername: " + username + "\tPassword: " + password);
+            repository.save(new User(username, bCryptPasswordEncoder.encode(password)));
             return "Record Inserted Successfully!";
         }
     }
